@@ -4,18 +4,33 @@ package app
 import (
 	"context"
 	"errors"
-	"github.com/ernur-eskermes/web-video-chat/internal/config"
-	delivery "github.com/ernur-eskermes/web-video-chat/internal/delivery/http"
-	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
-	"github.com/ernur-eskermes/web-video-chat/pkg/database/mongodb"
-	"github.com/ernur-eskermes/web-video-chat/pkg/hash"
-	"github.com/ernur-eskermes/web-video-chat/pkg/logger"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/ernur-eskermes/web-video-chat/internal/config"
+	delivery "github.com/ernur-eskermes/web-video-chat/internal/delivery/http"
+	"github.com/ernur-eskermes/web-video-chat/internal/repository"
+	"github.com/ernur-eskermes/web-video-chat/internal/server"
+	"github.com/ernur-eskermes/web-video-chat/internal/service"
+	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
+	"github.com/ernur-eskermes/web-video-chat/pkg/database/mongodb"
+	"github.com/ernur-eskermes/web-video-chat/pkg/hash"
+	"github.com/ernur-eskermes/web-video-chat/pkg/logger"
 )
+
+// @title Web-Video-Chat API
+// @version 1.0
+// @description REST API for Web-Video-Chat App
+
+// @host localhost:8000
+// @BasePath /api/v1/
+
+// @securityDefinitions.apikey UsersAuth
+// @in header
+// @name Authorization
 
 // Run initializes whole application.
 func Run(configPath string) {
@@ -48,14 +63,13 @@ func Run(configPath string) {
 	// Services, Repos & API Handlers
 	repos := repository.NewRepositories(db)
 	services := service.NewServices(service.Deps{
-		Repos:                  repos,
-		Hasher:                 hasher,
-		TokenManager:           tokenManager,
-		AccessTokenTTL:         cfg.Auth.JWT.AccessTokenTTL,
-		RefreshTokenTTL:        cfg.Auth.JWT.RefreshTokenTTL,
-		VerificationCodeLength: cfg.Auth.VerificationCodeLength,
-		Environment:            cfg.Environment,
-		Domain:                 cfg.HTTP.Host,
+		Repos:           repos,
+		Hasher:          hasher,
+		TokenManager:    tokenManager,
+		AccessTokenTTL:  cfg.Auth.JWT.AccessTokenTTL,
+		RefreshTokenTTL: cfg.Auth.JWT.RefreshTokenTTL,
+		Environment:     cfg.Environment,
+		Domain:          cfg.HTTP.Host,
 	})
 	handlers := delivery.NewHandler(services, tokenManager)
 

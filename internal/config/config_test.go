@@ -9,24 +9,15 @@ import (
 
 func TestInit(t *testing.T) {
 	type env struct {
-		mongoURI              string
-		mongoUser             string
-		mongoPass             string
-		passwordSalt          string
-		jwtSigningKey         string
-		host                  string
-		fondyCallbackURL      string
-		frontendUrl           string
-		smtpPassword          string
-		appEnv                string
-		storageEndpoint       string
-		storageBucket         string
-		storageAccessKey      string
-		storageSecretKey      string
-		cloudflareApiKey      string
-		cloudflareEmail       string
-		cloudflareZoneEmail   string
-		cloudflareCnameTarget string
+		mongoURI      string
+		mongoUser     string
+		mongoPass     string
+		passwordSalt  string
+		jwtSigningKey string
+		host          string
+		frontendUrl   string
+		smtpPassword  string
+		appEnv        string
 	}
 
 	type args struct {
@@ -83,7 +74,6 @@ func TestInit(t *testing.T) {
 						AccessTokenTTL:  time.Minute * 15,
 						SigningKey:      "key",
 					},
-					VerificationCodeLength: 10,
 				},
 				Mongo: MongoConfig{
 					Name:     "testDatabase",

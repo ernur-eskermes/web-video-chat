@@ -10,7 +10,6 @@ mongo:
 auth:
   accessTokenTTL: 2h
   refreshTokenTTL: 720h #30 days
-  verificationCodeLength: 8
 
 limiter:
   rps: 10

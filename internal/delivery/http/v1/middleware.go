@@ -5,30 +5,16 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ernur-eskermes/web-video-chat/internal/domain"
+	"github.com/gin-gonic/gin"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
 	authorizationHeader = "Authorization"
 
-	userCtx   = "userId"
-	domainCtx = "domain"
+	userCtx = "userId"
 )
-
-func parseRequestHost(c *gin.Context) string {
-	refererHeader := c.Request.Header.Get("Referer")
-	refererParts := strings.Split(refererHeader, "/")
-
-	// this logic is used to avoid crashes during integration testing
-	if len(refererParts) < 3 {
-		return c.Request.Host
-	}
-
-	hostParts := strings.Split(refererParts[2], ":")
-
-	return hostParts[0]
-}
 
 func (h *Handler) userIdentity(c *gin.Context) {
 	id, err := h.parseAuthHeader(c)
@@ -64,12 +50,12 @@ func getUserId(c *gin.Context) (primitive.ObjectID, error) {
 func getIdByContext(c *gin.Context, context string) (primitive.ObjectID, error) {
 	idFromCtx, ok := c.Get(context)
 	if !ok {
-		return primitive.ObjectID{}, errors.New("studentCtx not found")
+		return primitive.ObjectID{}, errors.New("userCtx not found")
 	}
 
 	idStr, ok := idFromCtx.(string)
 	if !ok {
-		return primitive.ObjectID{}, errors.New("studentCtx is of invalid type")
+		return primitive.ObjectID{}, errors.New("userCtx is of invalid type")
 	}
 
 	id, err := primitive.ObjectIDFromHex(idStr)
@@ -78,18 +64,4 @@ func getIdByContext(c *gin.Context, context string) (primitive.ObjectID, error) 
 	}
 
 	return id, nil
-}
-
-func getDomainFromContext(c *gin.Context) (string, error) {
-	val, ex := c.Get(domainCtx)
-	if !ex {
-		return "", errors.New("domainCtx not found")
-	}
-
-	valStr, ok := val.(string)
-	if !ok {
-		return "", errors.New("domainCtx is of invalid type")
-	}
-
-	return valStr, nil
 }
