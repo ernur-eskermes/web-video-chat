@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - '**'
-      - '!main'
+      - '!master'
       - '!develop'
   pull_request:
     branches:
       - '**'
-      - '!main'
+      - '!master'
       - '!develop'
 
 env:
@@ -42,11 +42,11 @@ jobs:
       - name: Unit Tests
         run: go test --short ./...
 
-      - name: Create test db container
-        run: docker run --rm -d -p 27019:27017 --name $(echo $TEST_CONTAINER_NAME) -e MONGODB_DATABASE=$(echo $TEST_DB_NAME) mongo:4.4-bionic
-
-      - name: Integration Tests
-        run: GIN_MODE=release go test -v ./tests/
-
-      - name: Kill test db container
-        run: docker stop $(echo $TEST_CONTAINER_NAME)
+#      - name: Create test db container
+#        run: docker run --rm -d -p 27019:27017 --name $(echo $TEST_CONTAINER_NAME) -e MONGODB_DATABASE=$(echo $TEST_DB_NAME) mongo:4.4-bionic
+#
+#      - name: Integration Tests
+#        run: GIN_MODE=release go test -v ./tests/
+#
+#      - name: Kill test db container
+#        run: docker stop $(echo $TEST_CONTAINER_NAME)
