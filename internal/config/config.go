@@ -27,6 +27,7 @@ type (
 		Mongo       MongoConfig
 		HTTP        HTTPConfig
 		Auth        AuthConfig
+		LiveKit     LiveKitConfig
 		Limiter     LimiterConfig
 	}
 
@@ -40,6 +41,12 @@ type (
 	AuthConfig struct {
 		JWT          JWTConfig
 		PasswordSalt string
+	}
+
+	LiveKitConfig struct {
+		Host      string
+		ApiKey    string
+		ApiSecret string
 	}
 
 	JWTConfig struct {
@@ -99,7 +106,10 @@ func unmarshal(cfg *Config) error {
 }
 
 func setFromEnv(cfg *Config) {
-	// TODO use envconfig https://github.com/kelseyhightower/envconfig
+	cfg.LiveKit.Host = os.Getenv("LIVEKIT_HOST")
+	cfg.LiveKit.ApiKey = os.Getenv("LIVEKIT_APIKEY")
+	cfg.LiveKit.ApiSecret = os.Getenv("LIVEKIT_APISECRET")
+
 	cfg.Mongo.URI = os.Getenv("MONGO_URI")
 	cfg.Mongo.User = os.Getenv("MONGO_USER")
 	cfg.Mongo.Password = os.Getenv("MONGO_PASS")

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/ernur-eskermes/web-video-chat/pkg/room"
 	"time"
 
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
@@ -25,6 +26,11 @@ type UserSignInInput struct {
 	Password string
 }
 
+type RoomCreateInput struct {
+	UserId primitive.ObjectID
+	Name   string
+}
+
 type Tokens struct {
 	AccessToken  string
 	RefreshToken string
@@ -37,8 +43,13 @@ type Users interface {
 	GetById(ctx context.Context, id primitive.ObjectID) (domain.User, error)
 }
 
+type Rooms interface {
+	Create(ctx context.Context, input RoomCreateInput) (primitive.ObjectID, string, error)
+}
+
 type Services struct {
 	Users Users
+	Rooms Rooms
 }
 
 type Deps struct {
@@ -49,13 +60,16 @@ type Deps struct {
 	RefreshTokenTTL time.Duration
 	Environment     string
 	Domain          string
+	Room            room.Room
 }
 
 func NewServices(deps Deps) *Services {
 	usersService := NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager,
 		deps.AccessTokenTTL, deps.RefreshTokenTTL, deps.Domain)
+	roomsService := NewRoomsService(deps.Repos.Rooms, deps.Room)
 
 	return &Services{
 		Users: usersService,
+		Rooms: roomsService,
 	}
 }

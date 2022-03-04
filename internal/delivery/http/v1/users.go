@@ -164,7 +164,8 @@ type userAccountResponse struct {
 }
 
 // @Summary Get User Info
-// @Security users-auth
+// @Tags users-auth
+// @Security UsersAuth
 // @Description user get me
 // @Accept  json
 // @Produce  json

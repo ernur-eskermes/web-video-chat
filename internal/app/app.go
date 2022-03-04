@@ -19,6 +19,7 @@ import (
 	"github.com/ernur-eskermes/web-video-chat/pkg/database/mongodb"
 	"github.com/ernur-eskermes/web-video-chat/pkg/hash"
 	"github.com/ernur-eskermes/web-video-chat/pkg/logger"
+	"github.com/ernur-eskermes/web-video-chat/pkg/room"
 )
 
 // @title Web-Video-Chat API
@@ -60,6 +61,8 @@ func Run(configPath string) {
 		return
 	}
 
+	roomService := room.NewRoom(cfg.LiveKit.Host, cfg.LiveKit.ApiKey, cfg.LiveKit.ApiSecret)
+
 	// Services, Repos & API Handlers
 	repos := repository.NewRepositories(db)
 	services := service.NewServices(service.Deps{
@@ -70,6 +73,7 @@ func Run(configPath string) {
 		RefreshTokenTTL: cfg.Auth.JWT.RefreshTokenTTL,
 		Environment:     cfg.Environment,
 		Domain:          cfg.HTTP.Host,
+		Room:            roomService,
 	})
 	handlers := delivery.NewHandler(services, tokenManager)
 

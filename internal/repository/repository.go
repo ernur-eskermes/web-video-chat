@@ -18,12 +18,18 @@ type Users interface {
 	GetById(ctx context.Context, id primitive.ObjectID) (domain.User, error)
 }
 
+type Rooms interface {
+	Create(ctx context.Context, room domain.Room) (primitive.ObjectID, error)
+}
+
 type Repositories struct {
 	Users Users
+	Rooms Rooms
 }
 
 func NewRepositories(db *mongo.Database) *Repositories {
 	return &Repositories{
 		Users: NewUsersRepo(db),
+		Rooms: NewRoomsRepo(db),
 	}
 }

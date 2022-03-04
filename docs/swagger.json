@@ -9,6 +9,69 @@
     "host": "localhost:8000",
     "basePath": "/api/v1/",
     "paths": {
+        "/rooms/create": {
+            "post": {
+                "security": [
+                    {
+                        "UsersAuth": []
+                    }
+                ],
+                "description": "create room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rooms-create"
+                ],
+                "summary": "Room Create",
+                "parameters": [
+                    {
+                        "description": "sign up info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.roomCreateInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/users/auth/refresh": {
             "post": {
                 "description": "user refresh tokens",
@@ -71,7 +134,7 @@
             "get": {
                 "security": [
                     {
-                        "users-auth": []
+                        "UsersAuth": []
                     }
                 ],
                 "description": "user get me",
@@ -80,6 +143,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users-auth"
                 ],
                 "summary": "Get User Info",
                 "responses": {
@@ -250,6 +316,19 @@
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "v1.roomCreateInput": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
                 }
             }
         },

@@ -38,9 +38,9 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 		corsMiddleware,
 	)
 
-	docs.SwaggerInfo_swagger.Host = fmt.Sprintf("%s:%s", cfg.HTTP.Host, cfg.HTTP.Port)
+	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", cfg.HTTP.Host, cfg.HTTP.Port)
 	if cfg.Environment != config.EnvLocal {
-		docs.SwaggerInfo_swagger.Host = cfg.HTTP.Host
+		docs.SwaggerInfo.Host = cfg.HTTP.Host
 	}
 
 	if cfg.Environment != config.Prod {

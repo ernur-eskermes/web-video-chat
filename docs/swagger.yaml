@@ -12,6 +12,15 @@ definitions:
       message:
         type: string
     type: object
+  v1.roomCreateInput:
+    properties:
+      name:
+        maxLength: 64
+        minLength: 8
+        type: string
+    required:
+    - name
+    type: object
   v1.signInInput:
     properties:
       password:
@@ -64,6 +73,46 @@ info:
   title: Web-Video-Chat API
   version: "1.0"
 paths:
+  /rooms/create:
+    post:
+      consumes:
+      - application/json
+      description: create room
+      parameters:
+      - description: sign up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/v1.roomCreateInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      security:
+      - UsersAuth: []
+      summary: Room Create
+      tags:
+      - rooms-create
   /users/auth/refresh:
     post:
       consumes:
@@ -131,8 +180,10 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       security:
-      - users-auth: []
+      - UsersAuth: []
       summary: Get User Info
+      tags:
+      - users-auth
   /users/sign-in:
     post:
       consumes:
