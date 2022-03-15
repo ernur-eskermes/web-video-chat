@@ -29,6 +29,13 @@ type (
 		Auth        AuthConfig
 		LiveKit     LiveKitConfig
 		Limiter     LimiterConfig
+		GoogleOauth GoogleOauthConfig
+	}
+
+	GoogleOauthConfig struct {
+		ClientId     string
+		ClientSecret string
+		CallbackURL  string
 	}
 
 	MongoConfig struct {
@@ -39,8 +46,9 @@ type (
 	}
 
 	AuthConfig struct {
-		JWT          JWTConfig
-		PasswordSalt string
+		JWT           JWTConfig
+		SessionSecret string
+		PasswordSalt  string
 	}
 
 	LiveKitConfig struct {
@@ -106,6 +114,10 @@ func unmarshal(cfg *Config) error {
 }
 
 func setFromEnv(cfg *Config) {
+	cfg.GoogleOauth.ClientId = os.Getenv("GOOGLE_OAUTH_CLIENT_ID")
+	cfg.GoogleOauth.ClientSecret = os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+	cfg.GoogleOauth.CallbackURL = os.Getenv("GOOGLE_OAUTH_CALLBACK_URL")
+
 	cfg.LiveKit.Host = os.Getenv("LIVEKIT_HOST")
 	cfg.LiveKit.ApiKey = os.Getenv("LIVEKIT_APIKEY")
 	cfg.LiveKit.ApiSecret = os.Getenv("LIVEKIT_APISECRET")
@@ -116,6 +128,7 @@ func setFromEnv(cfg *Config) {
 
 	cfg.Auth.PasswordSalt = os.Getenv("PASSWORD_SALT")
 	cfg.Auth.JWT.SigningKey = os.Getenv("JWT_SIGNING_KEY")
+	cfg.Auth.SessionSecret = os.Getenv("SESSION_SECRET")
 
 	cfg.HTTP.Host = os.Getenv("HTTP_HOST")
 

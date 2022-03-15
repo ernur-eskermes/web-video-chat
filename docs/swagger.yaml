@@ -1,5 +1,10 @@
 basePath: /api/v1/
 definitions:
+  v1.createSubscriptionInput:
+    properties:
+      user_id:
+        type: string
+    type: object
   v1.refreshInput:
     properties:
       token:
@@ -73,6 +78,150 @@ info:
   title: Web-Video-Chat API
   version: "1.0"
 paths:
+  /auth/{provider}:
+    get:
+      consumes:
+      - text/html
+      description: user auth provider
+      parameters:
+      - description: provider name
+        in: path
+        name: provider
+        required: true
+        type: string
+      responses: {}
+      summary: User Auth Provider
+      tags:
+      - users-auth
+  /auth/{provider}/callback:
+    get:
+      consumes:
+      - application/json
+      description: user auth provider callback
+      parameters:
+      - description: provider name
+        in: path
+        name: provider
+        required: true
+        type: string
+      responses: {}
+      summary: User Auth Provider Callback
+      tags:
+      - users-auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: user refresh tokens
+      parameters:
+      - description: sign up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/v1.refreshInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.tokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: User Refresh Tokens
+      tags:
+      - users-auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: user sign in
+      parameters:
+      - description: sign up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/v1.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.tokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: User SignIn
+      tags:
+      - users-auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: create user account
+      parameters:
+      - description: sign up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/v1.userSignUpInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: User SignUp
+      tags:
+      - users-auth
   /rooms/create:
     post:
       consumes:
@@ -113,44 +262,6 @@ paths:
       summary: Room Create
       tags:
       - rooms-create
-  /users/auth/refresh:
-    post:
-      consumes:
-      - application/json
-      description: user refresh tokens
-      parameters:
-      - description: sign up info
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/v1.refreshInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.tokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/v1.response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/v1.response'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/v1.response'
-      summary: User Refresh Tokens
-      tags:
-      - users-auth
   /users/me:
     get:
       consumes:
@@ -183,62 +294,24 @@ paths:
       - UsersAuth: []
       summary: Get User Info
       tags:
-      - users-auth
-  /users/sign-in:
+      - users
+  /users/subscriptions/create:
     post:
       consumes:
       - application/json
-      description: user sign in
+      description: create user subscription
       parameters:
-      - description: sign up info
+      - description: create subscription
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/v1.signInInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.tokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/v1.response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/v1.response'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/v1.response'
-      summary: User SignIn
-      tags:
-      - users-auth
-  /users/sign-up:
-    post:
-      consumes:
-      - application/json
-      description: create user account
-      parameters:
-      - description: sign up info
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/v1.userSignUpInput'
+          $ref: '#/definitions/v1.createSubscriptionInput'
       produces:
       - application/json
       responses:
         "201":
-          description: ok
+          description: Created
           schema:
             type: string
         "400":
@@ -257,9 +330,11 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/v1.response'
-      summary: User SignUp
+      security:
+      - UsersAuth: []
+      summary: Create User Subscription
       tags:
-      - users-auth
+      - users
 securityDefinitions:
   UsersAuth:
     in: header

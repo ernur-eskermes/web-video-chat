@@ -36,18 +36,28 @@ func (r *UsersRepo) GetById(ctx context.Context, id primitive.ObjectID) (domain.
 	return user, nil
 }
 
-func (r *UsersRepo) Create(ctx context.Context, user domain.User) error {
-	_, err := r.db.InsertOne(ctx, user)
+func (r *UsersRepo) Create(ctx context.Context, user *domain.User) error {
+	res, err := r.db.InsertOne(ctx, user)
 	if mongodb.IsDuplicate(err) {
 		return domain.ErrUserAlreadyExists
 	}
 
+	user.ID = res.InsertedID.(primitive.ObjectID) //nolint:forcetypeassert
+
 	return err
 }
 
-func (r *UsersRepo) GetByCredentials(ctx context.Context, username, password string) (domain.User, error) {
+func (r *UsersRepo) CreateSubscription(ctx context.Context, userId, subscription primitive.ObjectID) error {
+	_, err := r.db.UpdateOne(ctx, bson.M{"_id": userId}, bson.M{"$addToSet": bson.M{"pnd_subs": subscription}})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *UsersRepo) GetByCredentials(ctx context.Context, username, password, provider string) (domain.User, error) {
 	var user domain.User
-	if err := r.db.FindOne(ctx, bson.M{"username": username, "password": password}).Decode(&user); err != nil {
+	if err := r.db.FindOne(ctx, bson.M{"username": username, "password": password, "provider": provider}).Decode(&user); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return domain.User{}, domain.ErrUserNotFound
 		}

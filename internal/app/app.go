@@ -4,6 +4,11 @@ package app
 import (
 	"context"
 	"errors"
+	"github.com/gorilla/sessions"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/google"
+	"gopkg.in/olahol/melody.v1"
 	"net/http"
 	"os"
 	"os/signal"
@@ -43,12 +48,16 @@ func Run(configPath string) {
 	}
 
 	// Dependencies
+	OAuthInit(cfg)
+
 	mongoClient, err := mongodb.NewClient(cfg.Mongo.URI, cfg.Mongo.User, cfg.Mongo.Password)
 	if err != nil {
 		logger.Error(err)
 
 		return
 	}
+
+	websocket := melody.New()
 
 	db := mongoClient.Database(cfg.Mongo.Name)
 
@@ -74,8 +83,9 @@ func Run(configPath string) {
 		Environment:     cfg.Environment,
 		Domain:          cfg.HTTP.Host,
 		Room:            roomService,
+		Websocket:       websocket,
 	})
-	handlers := delivery.NewHandler(services, tokenManager)
+	handlers := delivery.NewHandler(services, tokenManager, websocket)
 
 	// HTTP Server
 	srv := server.NewServer(cfg, handlers.Init(cfg))
@@ -106,4 +116,16 @@ func Run(configPath string) {
 	if err := mongoClient.Disconnect(context.Background()); err != nil {
 		logger.Error(err.Error())
 	}
+}
+
+func OAuthInit(cfg *config.Config) {
+	store := sessions.NewCookieStore([]byte(cfg.Auth.SessionSecret))
+	store.Options.HttpOnly = true // HttpOnly should always be enabled
+	store.Options.Secure = cfg.Environment == config.Prod
+
+	gothic.Store = store
+
+	goth.UseProviders(
+		google.New(cfg.GoogleOauth.ClientId, cfg.GoogleOauth.ClientSecret, cfg.GoogleOauth.CallbackURL),
+	)
 }

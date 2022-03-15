@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/markbates/goth"
 	"time"
 
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
@@ -45,10 +46,11 @@ func (s *UsersService) SignUp(ctx context.Context, input UserSignUpInput) error 
 		Username:     input.Username,
 		Password:     passwordHash,
 		RegisteredAt: time.Now(),
-		LastVisitAt:  time.Now(),
+		PNDSubs:      []primitive.ObjectID{},
+		ACCSubs:      []primitive.ObjectID{},
 	}
 
-	if err := s.repo.Create(ctx, user); err != nil {
+	if err := s.repo.Create(ctx, &user); err != nil {
 		if errors.Is(err, domain.ErrUserAlreadyExists) {
 			return err
 		}
@@ -65,7 +67,7 @@ func (s *UsersService) SignIn(ctx context.Context, input UserSignInInput) (Token
 		return Tokens{}, err
 	}
 
-	user, err := s.repo.GetByCredentials(ctx, input.Username, passwordHash)
+	user, err := s.repo.GetByCredentials(ctx, input.Username, passwordHash, "")
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
 			return Tokens{}, err
@@ -114,4 +116,29 @@ func (s *UsersService) createSession(ctx context.Context, userId primitive.Objec
 	err = s.repo.SetSession(ctx, userId, session)
 
 	return res, err
+}
+
+func (s *UsersService) AuthProvider(ctx context.Context, user goth.User) (Tokens, error) {
+	userObj, err := s.repo.GetByCredentials(ctx, user.Email, "", user.Provider)
+	if err != nil {
+		if errors.Is(domain.ErrUserNotFound, err) {
+			userObj = domain.User{
+				Username:     user.Email,
+				RegisteredAt: time.Now(),
+				Provider:     user.Provider,
+				PNDSubs:      []primitive.ObjectID{},
+				ACCSubs:      []primitive.ObjectID{},
+			}
+			if err = s.repo.Create(ctx, &userObj); err != nil {
+				return Tokens{}, err
+			}
+			return s.createSession(ctx, userObj.ID)
+		}
+		return Tokens{}, err
+	}
+	return s.createSession(ctx, userObj.ID)
+}
+
+func (s *UsersService) CreateSubscription(ctx context.Context, userId, subscription primitive.ObjectID) error {
+	return s.repo.CreateSubscription(ctx, userId, subscription)
 }

@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"gopkg.in/olahol/melody.v1"
 	"net/http"
 
 	"github.com/ernur-eskermes/web-video-chat/docs"
@@ -18,12 +19,14 @@ import (
 type Handler struct {
 	services     *service.Services
 	tokenManager auth.TokenManager
+	websocket    *melody.Melody
 }
 
-func NewHandler(services *service.Services, tokenManager auth.TokenManager) *Handler {
+func NewHandler(services *service.Services, tokenManager auth.TokenManager, websocket *melody.Melody) *Handler {
 	return &Handler{
 		services:     services,
 		tokenManager: tokenManager,
+		websocket:    websocket,
 	}
 }
 
@@ -37,6 +40,7 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 		limiter.Limit(cfg.Limiter.RPS, cfg.Limiter.Burst, cfg.Limiter.TTL),
 		corsMiddleware,
 	)
+	router.LoadHTMLGlob("templates/*")
 
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", cfg.HTTP.Host, cfg.HTTP.Port)
 	if cfg.Environment != config.EnvLocal {
@@ -58,7 +62,7 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 }
 
 func (h *Handler) initAPI(router *gin.Engine) {
-	handlerV1 := v1.NewHandler(h.services, h.tokenManager)
+	handlerV1 := v1.NewHandler(h.services, h.tokenManager, h.websocket)
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

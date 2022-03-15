@@ -1,6 +1,7 @@
 package http_test
 
 import (
+	"gopkg.in/olahol/melody.v1"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,13 +15,13 @@ import (
 )
 
 func TestNewHandler(t *testing.T) {
-	h := handler.NewHandler(&service.Services{}, &auth.Manager{})
+	h := handler.NewHandler(&service.Services{}, &auth.Manager{}, &melody.Melody{})
 
 	require.IsType(t, &handler.Handler{}, h)
 }
 
 func TestNewHandler_Init(t *testing.T) {
-	h := handler.NewHandler(&service.Services{}, &auth.Manager{})
+	h := handler.NewHandler(&service.Services{}, &auth.Manager{}, &melody.Melody{})
 
 	router := h.Init(&config.Config{
 		Limiter: config.LimiterConfig{

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"github.com/ernur-eskermes/web-video-chat/pkg/room"
+	"github.com/markbates/goth"
+	"gopkg.in/olahol/melody.v1"
 	"time"
 
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
@@ -41,15 +43,29 @@ type Users interface {
 	SignIn(ctx context.Context, input UserSignInInput) (Tokens, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 	GetById(ctx context.Context, id primitive.ObjectID) (domain.User, error)
+	AuthProvider(ctx context.Context, user goth.User) (Tokens, error)
+	CreateSubscription(ctx context.Context, subscriberId, userId primitive.ObjectID) error
 }
 
 type Rooms interface {
 	Create(ctx context.Context, input RoomCreateInput) (primitive.ObjectID, string, error)
 }
 
+type CreateMessageInput struct {
+	ChatId  primitive.ObjectID
+	UserId  primitive.ObjectID
+	Message string
+}
+
+type Chats interface {
+	GetMessages(ctx context.Context, chatId primitive.ObjectID) ([]domain.Message, error)
+	CreateMessage(ctx context.Context, input CreateMessageInput) error
+}
+
 type Services struct {
 	Users Users
 	Rooms Rooms
+	Chats Chats
 }
 
 type Deps struct {
@@ -61,15 +77,18 @@ type Deps struct {
 	Environment     string
 	Domain          string
 	Room            room.Room
+	Websocket       *melody.Melody
 }
 
 func NewServices(deps Deps) *Services {
 	usersService := NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager,
 		deps.AccessTokenTTL, deps.RefreshTokenTTL, deps.Domain)
 	roomsService := NewRoomsService(deps.Repos.Rooms, deps.Room)
+	chatsService := NewChatsService(deps.Repos.Chats, deps.Websocket)
 
 	return &Services{
 		Users: usersService,
 		Rooms: roomsService,
+		Chats: chatsService,
 	}
 }
