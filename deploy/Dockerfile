@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine3.12 AS builder
+FROM golang:1.17-alpine AS builder
 
 RUN go version
 

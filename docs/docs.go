@@ -493,8 +493,20 @@ var doc = `{
         "v1.userAccountResponse": {
             "type": "object",
             "properties": {
+                "acc_subs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "id": {
                     "type": "string"
+                },
+                "pnd_subs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "username": {
                     "type": "string"

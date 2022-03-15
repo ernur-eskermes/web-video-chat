@@ -48,8 +48,16 @@ definitions:
     type: object
   v1.userAccountResponse:
     properties:
+      acc_subs:
+        items:
+          type: string
+        type: array
       id:
         type: string
+      pnd_subs:
+        items:
+          type: string
+        type: array
       username:
         type: string
     type: object

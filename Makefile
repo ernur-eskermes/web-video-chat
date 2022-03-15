@@ -8,6 +8,12 @@ build:
 run: build
 	docker-compose up --remove-orphans app
 
+docker:
+	docker-compose -f deploy/docker-compose.yml up --build
+
+docker-up:
+	docker-compose -f deploy/docker-compose.yml up
+
 debug: build
 	docker-compose up --remove-orphans debug
 
