@@ -6,116 +6,121 @@ on:
       - master
 
 env:
-  REGISTRY: "registry.digitalocean.com/sandbox-registry"
-  API_IMAGE: "courses-backend"
-  NGINX_IMAGE: "courses-backend-proxy"
+  REGISTRY: docker.pkg.github.com
   TAG: "stable"
   TEST_CONTAINER_NAME: "test_db"
   TEST_DB_NAME: "test"
   TEST_DB_URI: "mongodb://localhost:27019"
-  APP_ENV: "prod"
+  API_IMAGE: wvc-project
 
 jobs:
 
-    tests:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Install Go
-          uses: actions/setup-go@v2
-          with:
-            go-version: 1.17
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
 
-        - name: Checkout code
-          uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-        - name: Unit Tests
-          run: go test --short ./...
+  #        - name: Unit Tests
+  #          run: go test --short ./...
 
-#        - name: Create test db container
-#          run: docker run --rm -d -p 27019:27017 --name $(echo $TEST_CONTAINER_NAME) -e MONGODB_DATABASE=$(echo $TEST_DB_NAME) mongo:4.4-bionic
-#
-#        - name: Integration Tests
-#          run: GIN_MODE=release go test -v ./tests/
-#
-#        - name: Kill test db container
-#          run: docker stop $(echo $TEST_CONTAINER_NAME)
-#
-#    build_and_push:
-#      runs-on: ubuntu-latest
-#      needs: tests
-#
-#      steps:
-#        - name: Checkout code
-#          uses: actions/checkout@v2
-#
-#        - name: Build API container image
-#          run: docker build -f deploy/Dockerfile -t $(echo $REGISTRY)/$(echo $API_IMAGE):$(echo $TAG) .
-#        - name: Build NGINX container image
-#          run: docker build -f deploy/nginx/Dockerfile -t $(echo $REGISTRY)/$(echo $NGINX_IMAGE):$(echo $TAG) .
-#
-#        - name: Install doctl
-#          uses: digitalocean/action-doctl@v2
-#          with:
-#            token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-#
-#        - name: Log in to DigitalOcean Container Registry with short-lived credentials
-#          run: doctl registry login --expiry-seconds 600
-#
-#        - name: Push API image to DigitalOcean Container Registry
-#          run: docker push $(echo $REGISTRY)/$(echo $API_IMAGE):$(echo $TAG)
-#
-#        - name: Push NGINX image to DigitalOcean Container Registry
-#          run: docker push $(echo $REGISTRY)/$(echo $NGINX_IMAGE):$(echo $TAG)
-#
-#    deploy:
-#      environment: production
-#      runs-on: ubuntu-latest
-#      needs: build_and_push
-#
-#      steps:
-#        - uses: actions/checkout@master
-#        - name: copy file via ssh password
-#          uses: appleboy/scp-action@master
-#          with:
-#            host: ${{ secrets.HOST }}
-#            username: ${{ secrets.USERNAME }}
-#            key: ${{ secrets.SSHKEY }}
-#            source: "deploy/,!deploy/nginx,!deploy/Dockerfile"
-#            target: "api"
-#            strip_components: 1
-#
-#        - name: Deploy to Digital Ocean droplet via SSH action
-#          uses: appleboy/ssh-action@v0.1.3
-#          env:
-#            SERVER_NAME: "api-prod.wvc.me"
-#          with:
-#            host: ${{ secrets.HOST }}
-#            username: ${{ secrets.USERNAME }}
-#            key: ${{ secrets.SSHKEY }}
-#            envs: API_IMAGE,NGINX_IMAGE,TAG,REGISTRY,SERVER_NAME,APP_ENV
-#            script: |
-#              # Set env variables
-#              export MONGO_URI="${{ secrets.MONGO_URI }}"
-#              export MONGO_USER="${{ secrets.MONGO_USER }}"
-#              export MONGO_PASS="${{ secrets.MONGO_PASS }}"
-#              export PASSWORD_SALT="${{ secrets.PASSWORD_SALT }}"
-#              export JWT_SIGNING_KEY="${{ secrets.JWT_SIGNING_KEY }}"
-#              export HTTP_HOST="${{secrets.HTTP_HOST}}"
-#              export FRONTEND_URL=${{secrets.FRONTEND_URL}}
-#              export SERVER_NAME=$(echo $SERVER_NAME)
-#              export REGISTRY=$(echo $REGISTRY)
-#              export API_IMAGE=$(echo $API_IMAGE)
-#              export NGINX_IMAGE=$(echo $NGINX_IMAGE)
-#
-#              export TAG=$(echo $TAG)
-#              export APP_ENV=$(echo $APP_ENV)
-#
-#              # Login into Digital Ocean Registry
-#              docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} $(echo $REGISTRY)
-#
-#              # Run a new container from a new image
-#              cd api
-#              docker-compose stop
-#              docker-compose rm -f
-#              docker-compose pull
-#              docker-compose up -d --force-recreate nginx
+  #        - name: Create test db container
+  #          run: docker run --rm -d -p 27019:27017 --name $(echo $TEST_CONTAINER_NAME) -e MONGODB_DATABASE=$(echo $TEST_DB_NAME) mongo:4.4-bionic
+  #
+  #        - name: Integration Tests
+  #          run: GIN_MODE=release go test -v ./tests/
+  #
+  #        - name: Kill test db container
+  #          run: docker stop $(echo $TEST_CONTAINER_NAME)
+  #
+  build_and_push:
+    runs-on: ubuntu-latest
+    needs: tests
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./deploy/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ github.event.repository.name }}/${{ env.API_IMAGE }}:${{ env.TAG }}
+  deploy:
+    environment: production
+    runs-on: ubuntu-latest
+    needs: build_and_push
+
+    steps:
+      - name: Install git-secret
+        env:
+          SECRETS_VERBOSE: 1
+          PREFIX: "/usr/local"
+        run: |
+          git clone https://github.com/sobolevn/git-secret.git git-secret
+          cd git-secret
+          sudo make build
+          sudo make install
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure GPG Key
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SECRET_PWD }}
+          git-user-signingkey: true
+          git-commit-gpgsign: true
+
+      - name: Reveal secrets
+        env:
+          SECRET_PWD: ${{ secrets.SECRET_PWD }}
+          SECRETS_VERBOSE: 1
+        run: |
+          git secret reveal -p $(echo $SECRET_PWD)
+
+      - name: copy file via ssh password
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          rm: true
+          source: "./*"
+          target: "api"
+
+      - name: Deploy to Server via SSH action
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            # Login into GitHub Registry
+            echo ${{ secrets.PAT }} | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+            
+            # Run a new container from a new image
+            cd api
+            docker-compose -f deploy/docker-compose.yml stop
+            docker-compose -f deploy/docker-compose.yml rm -f
+            docker-compose -f deploy/docker-compose.yml pull
+            docker-compose -f deploy/docker-compose.yml up -d

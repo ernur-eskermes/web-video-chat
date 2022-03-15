@@ -39,9 +39,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Unit Tests
-        run: go test --short ./...
-
+#      - name: Unit Tests
+#        run: go test --short ./...
+#
 #      - name: Create test db container
 #        run: docker run --rm -d -p 27019:27017 --name $(echo $TEST_CONTAINER_NAME) -e MONGODB_DATABASE=$(echo $TEST_DB_NAME) mongo:4.4-bionic
 #

@@ -8,3 +8,5 @@ cover.out
 
 # Visual Studio Settings
 .vscode
+.gitsecret/keys/random_seed
+!*.secret
