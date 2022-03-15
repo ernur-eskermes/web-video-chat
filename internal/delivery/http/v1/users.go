@@ -18,8 +18,10 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 }
 
 type userAccountResponse struct {
-	ID       primitive.ObjectID `json:"id"`
-	Username string             `json:"username"`
+	ID       primitive.ObjectID   `json:"id"`
+	Username string               `json:"username"`
+	ACCSubs  []primitive.ObjectID `json:"acc_subs" bson:"acc_subs"`
+	PNDSubs  []primitive.ObjectID `json:"pnd_subs" bson:"pnd_subs"`
 }
 
 // @Summary Get User Info
@@ -51,6 +53,8 @@ func (h *Handler) userGetMe(c *gin.Context) {
 	c.JSON(http.StatusOK, userAccountResponse{
 		ID:       userId,
 		Username: user.Username,
+		ACCSubs:  user.ACCSubs,
+		PNDSubs:  user.PNDSubs,
 	})
 }
 
