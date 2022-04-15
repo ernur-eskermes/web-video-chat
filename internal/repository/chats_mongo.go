@@ -27,7 +27,7 @@ func (r *ChatsRepo) GetChatMessages(ctx context.Context, id primitive.ObjectID) 
 		return nil, err
 	}
 
-	if err := cur.All(ctx, &messages); err != nil {
+	if err = cur.All(ctx, &messages); err != nil {
 		return nil, err
 	}
 
