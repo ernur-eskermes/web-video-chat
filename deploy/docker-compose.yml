@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   app:
-    image: docker.pkg.github.com/ernur-eskermes/web-video-chat/wvc-project:stable
     container_name: wvc-backend-app
     build:
       context: ../
