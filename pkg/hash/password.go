@@ -1,7 +1,7 @@
 package hash
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 )
 
@@ -10,18 +10,18 @@ type PasswordHasher interface {
 	Hash(password string) (string, error)
 }
 
-// SHA1Hasher uses SHA1 to hash passwords with provided salt.
-type SHA1Hasher struct {
+// SHA256Hasher uses SHA256 to hash passwords with provided salt.
+type SHA256Hasher struct {
 	salt string
 }
 
-func NewSHA1Hasher(salt string) *SHA1Hasher {
-	return &SHA1Hasher{salt: salt}
+func NewSHA256Hasher(salt string) *SHA256Hasher {
+	return &SHA256Hasher{salt: salt}
 }
 
 // Hash creates SHA1 hash of given password.
-func (h *SHA1Hasher) Hash(password string) (string, error) {
-	hash := sha1.New()
+func (h *SHA256Hasher) Hash(password string) (string, error) {
+	hash := sha256.New()
 
 	if _, err := hash.Write([]byte(password)); err != nil {
 		return "", err

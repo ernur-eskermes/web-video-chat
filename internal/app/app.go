@@ -62,7 +62,7 @@ func Run(configPath string) {
 
 	db := mongoClient.Database(cfg.Mongo.Name)
 
-	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
+	hasher := hash.NewSHA256Hasher(cfg.Auth.PasswordSalt)
 
 	tokenManager, err := auth.NewManager(cfg.Auth.JWT.SigningKey)
 	if err != nil {
