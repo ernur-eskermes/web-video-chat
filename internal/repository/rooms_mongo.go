@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,6 +21,14 @@ func NewRoomsRepo(db *mongo.Database) *RoomsRepo {
 
 func (r *RoomsRepo) Create(ctx context.Context, room domain.Room) (primitive.ObjectID, error) {
 	res, err := r.db.InsertOne(ctx, room)
+	if err != nil {
+		return primitive.ObjectID{}, err
+	}
 
-	return res.InsertedID.(primitive.ObjectID), err
+	v, ok := res.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return primitive.ObjectID{}, errors.New("id type is incorrect")
+	}
+
+	return v, nil
 }

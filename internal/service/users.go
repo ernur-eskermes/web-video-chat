@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/markbates/goth"
 	"time"
+
+	"github.com/markbates/goth"
 
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
@@ -132,10 +133,13 @@ func (s *UsersService) AuthProvider(ctx context.Context, user goth.User) (Tokens
 			if err = s.repo.Create(ctx, &userObj); err != nil {
 				return Tokens{}, err
 			}
+
 			return s.createSession(ctx, userObj.ID)
 		}
+
 		return Tokens{}, err
 	}
+
 	return s.createSession(ctx, userObj.ID)
 }
 

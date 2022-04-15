@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -35,5 +36,6 @@ func (r *ChatsRepo) GetChatMessages(ctx context.Context, id primitive.ObjectID) 
 
 func (r *ChatsRepo) CreateMessage(ctx context.Context, message domain.Message) error {
 	_, err := r.db.InsertOne(ctx, message)
+
 	return err
 }

@@ -181,6 +181,7 @@ func (h *Handler) userAuthProviderCallback(c *gin.Context) {
 
 		return
 	}
+
 	res, err := h.services.Users.AuthProvider(c.Request.Context(), user)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())

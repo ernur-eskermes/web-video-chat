@@ -2,8 +2,9 @@ package http
 
 import (
 	"fmt"
-	"gopkg.in/olahol/melody.v1"
 	"net/http"
+
+	"gopkg.in/olahol/melody.v1"
 
 	"github.com/ernur-eskermes/web-video-chat/docs"
 	"github.com/ernur-eskermes/web-video-chat/internal/config"

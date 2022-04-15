@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/ernur-eskermes/web-video-chat/pkg/room"
 	"github.com/markbates/goth"
 	"gopkg.in/olahol/melody.v1"
-	"time"
 
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"

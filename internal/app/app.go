@@ -4,16 +4,17 @@ package app
 import (
 	"context"
 	"errors"
-	"github.com/gorilla/sessions"
-	"github.com/markbates/goth"
-	"github.com/markbates/goth/gothic"
-	"github.com/markbates/goth/providers/google"
-	"gopkg.in/olahol/melody.v1"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/google"
+	"gopkg.in/olahol/melody.v1"
 
 	"github.com/ernur-eskermes/web-video-chat/internal/config"
 	delivery "github.com/ernur-eskermes/web-video-chat/internal/delivery/http"

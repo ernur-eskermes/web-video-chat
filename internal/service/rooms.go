@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
 	"github.com/ernur-eskermes/web-video-chat/pkg/room"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 )
 
 type RoomsService struct {
@@ -31,9 +32,11 @@ func (r *RoomsService) Create(ctx context.Context, input RoomCreateInput) (primi
 	if err != nil {
 		return primitive.ObjectID{}, "", err
 	}
+
 	token, err := r.room.GetJoinToken(roomId.String(), input.UserId.String())
 	if err != nil {
 		return primitive.ObjectID{}, "", err
 	}
+
 	return roomId, token, nil
 }

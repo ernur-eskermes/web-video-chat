@@ -52,6 +52,7 @@ func (r *UsersRepo) CreateSubscription(ctx context.Context, userId, subscription
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

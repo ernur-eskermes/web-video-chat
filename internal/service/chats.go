@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/domain"
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gopkg.in/olahol/melody.v1"
-	"time"
 )
 
 type ChatsService struct {

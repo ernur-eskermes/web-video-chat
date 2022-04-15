@@ -1,9 +1,10 @@
 package room
 
 import (
+	"time"
+
 	"github.com/livekit/protocol/auth"
 	lksdk "github.com/livekit/server-sdk-go"
-	"time"
 )
 
 type authBase struct {

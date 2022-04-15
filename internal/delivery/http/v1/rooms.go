@@ -1,10 +1,11 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
 )
 
 func (h *Handler) initRoomsRoutes(api *gin.RouterGroup) {
@@ -63,6 +64,7 @@ func (h *Handler) roomCreate(c *gin.Context) {
 
 		return
 	}
+
 	c.JSON(http.StatusCreated, roomCreateResponse{
 		ID:    roomId,
 		Token: token,
