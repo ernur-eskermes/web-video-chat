@@ -73,4 +73,4 @@ jobs:
             cd api
             docker-compose -f deploy/docker-compose.yml stop
             docker-compose -f deploy/docker-compose.yml rm -f
-            docker-compose -f deploy/docker-compose.yml up --build
+            docker-compose -f deploy/docker-compose.yml up --build -d

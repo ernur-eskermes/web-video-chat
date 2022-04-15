@@ -13,3 +13,16 @@ services:
       - "8000:8000"
     env_file:
       - ../.env
+  caddy:
+    image: caddy:2.4.6-alpine
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - backend
+networks:
+  backend:
+    name: backend
+    external: true
