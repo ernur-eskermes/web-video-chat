@@ -2,11 +2,12 @@ package v1
 
 import (
 	"encoding/json"
+	"net/http"
+	"sync"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/olahol/melody.v1"
-	"net/http"
-	"sync"
 )
 
 func (h *Handler) initChatsRoutes(api *gin.RouterGroup) {
@@ -28,15 +29,18 @@ func (h *Handler) chatWebsocket(c *gin.Context) {
 
 		return
 	}
+
 	userId, err := getUserId(c)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 
 		return
 	}
+
 	lock := new(sync.Mutex)
+
 	h.websocket.HandleMessage(func(s *melody.Session, msg []byte) {
-		h.websocket.Broadcast(msg)
+		_ = h.websocket.Broadcast(msg)
 
 		_ = h.services.Chats.CreateMessage(c, service.CreateMessageInput{
 			Message: string(msg),
@@ -51,5 +55,10 @@ func (h *Handler) chatWebsocket(c *gin.Context) {
 		s.Write(b)
 		lock.Unlock()
 	})
-	h.websocket.HandleRequest(c.Writer, c.Request)
+
+	if err = h.websocket.HandleRequest(c.Writer, c.Request); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
 }

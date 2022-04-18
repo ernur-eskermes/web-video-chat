@@ -1,15 +1,16 @@
-package http_test
+package rest_test
 
 import (
-	"gopkg.in/olahol/melody.v1"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	"gopkg.in/olahol/melody.v1"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/config"
-	handler "github.com/ernur-eskermes/web-video-chat/internal/delivery/http"
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
+	handler "github.com/ernur-eskermes/web-video-chat/internal/transport/rest"
 	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
 	"github.com/stretchr/testify/require"
 )

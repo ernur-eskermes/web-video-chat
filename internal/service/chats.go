@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/ernur-eskermes/web-video-chat/internal/domain"
+	"time"
+
+	"github.com/ernur-eskermes/web-video-chat/internal/core"
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gopkg.in/olahol/melody.v1"
-	"time"
 )
 
 type ChatsService struct {
@@ -21,12 +22,12 @@ func NewChatsService(repo repository.Chats, websocket *melody.Melody) *ChatsServ
 	}
 }
 
-func (c *ChatsService) GetMessages(ctx context.Context, id primitive.ObjectID) ([]domain.Message, error) {
+func (c *ChatsService) GetMessages(ctx context.Context, id primitive.ObjectID) ([]core.Message, error) {
 	return c.repo.GetChatMessages(ctx, id)
 }
 
 func (c *ChatsService) CreateMessage(ctx context.Context, input CreateMessageInput) error {
-	return c.repo.CreateMessage(ctx, domain.Message{
+	return c.repo.CreateMessage(ctx, core.Message{
 		Sender:    input.UserId,
 		ChatId:    input.ChatId,
 		Text:      input.Message,

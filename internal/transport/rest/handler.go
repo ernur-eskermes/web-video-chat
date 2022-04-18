@@ -1,14 +1,17 @@
-package http
+package rest
 
 import (
 	"fmt"
-	"gopkg.in/olahol/melody.v1"
 	"net/http"
+
+	"github.com/gin-contrib/cors"
+
+	"gopkg.in/olahol/melody.v1"
 
 	"github.com/ernur-eskermes/web-video-chat/docs"
 	"github.com/ernur-eskermes/web-video-chat/internal/config"
-	v1 "github.com/ernur-eskermes/web-video-chat/internal/delivery/http/v1"
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
+	v1 "github.com/ernur-eskermes/web-video-chat/internal/transport/rest/v1"
 	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
 	"github.com/ernur-eskermes/web-video-chat/pkg/limiter"
 	"github.com/gin-gonic/gin"
@@ -37,8 +40,8 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 	router.Use(
 		gin.Recovery(),
 		gin.Logger(),
+		cors.Default(),
 		limiter.Limit(cfg.Limiter.RPS, cfg.Limiter.Burst, cfg.Limiter.TTL),
-		corsMiddleware,
 	)
 	router.LoadHTMLGlob("templates/*")
 

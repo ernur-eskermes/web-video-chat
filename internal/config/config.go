@@ -102,7 +102,7 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 
-	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
+	if err := viper.UnmarshalKey("rest", &cfg.HTTP); err != nil {
 		return err
 	}
 
@@ -153,10 +153,10 @@ func parseConfigFile(folder, env string) error {
 }
 
 func populateDefaults() {
-	viper.SetDefault("http.port", defaultHTTPPort)
-	viper.SetDefault("http.max_header_megabytes", defaultHTTPMaxHeaderMegabytes)
-	viper.SetDefault("http.timeouts.read", defaultHTTPRWTimeout)
-	viper.SetDefault("http.timeouts.write", defaultHTTPRWTimeout)
+	viper.SetDefault("rest.port", defaultHTTPPort)
+	viper.SetDefault("rest.max_header_megabytes", defaultHTTPMaxHeaderMegabytes)
+	viper.SetDefault("rest.timeouts.read", defaultHTTPRWTimeout)
+	viper.SetDefault("rest.timeouts.write", defaultHTTPRWTimeout)
 	viper.SetDefault("auth.accessTokenTTL", defaultAccessTokenTTL)
 	viper.SetDefault("auth.refreshTokenTTL", defaultRefreshTokenTTL)
 	viper.SetDefault("limiter.rps", defaultLimiterRPS)

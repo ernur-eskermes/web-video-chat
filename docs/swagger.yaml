@@ -1,5 +1,42 @@
 basePath: /api/v1/
 definitions:
+  core.Room:
+    properties:
+      author:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      invites:
+        items:
+          type: string
+        type: array
+      members:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      visibility:
+        type: boolean
+    type: object
+  core.RoomCreateInput:
+    properties:
+      invites:
+        items:
+          type: string
+        type: array
+      name:
+        maxLength: 64
+        minLength: 8
+        type: string
+      visibility:
+        type: boolean
+    required:
+    - name
+    - visibility
+    type: object
   v1.createSubscriptionInput:
     properties:
       user_id:
@@ -17,14 +54,17 @@ definitions:
       message:
         type: string
     type: object
-  v1.roomCreateInput:
+  v1.roomCreateResponse:
     properties:
-      name:
-        maxLength: 64
-        minLength: 8
+      id:
         type: string
-    required:
-    - name
+      token:
+        type: string
+    type: object
+  v1.roomTokenResponse:
+    properties:
+      token:
+        type: string
     type: object
   v1.signInInput:
     properties:
@@ -230,6 +270,78 @@ paths:
       summary: User SignUp
       tags:
       - users-auth
+  /rooms:
+    get:
+      consumes:
+      - application/json
+      description: get rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Room'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      security:
+      - UsersAuth: []
+      summary: Room List
+      tags:
+      - rooms
+  /rooms/{roomID}/join:
+    post:
+      consumes:
+      - application/json
+      description: Join Room
+      parameters:
+      - description: room id
+        in: path
+        name: roomID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.roomTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      security:
+      - UsersAuth: []
+      summary: Join Room
+      tags:
+      - rooms
   /rooms/create:
     post:
       consumes:
@@ -241,14 +353,14 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/v1.roomCreateInput'
+          $ref: '#/definitions/core.RoomCreateInput'
       produces:
       - application/json
       responses:
         "201":
-          description: ok
+          description: Created
           schema:
-            type: string
+            $ref: '#/definitions/v1.roomCreateResponse'
         "400":
           description: Bad Request
           schema:
@@ -269,7 +381,7 @@ paths:
       - UsersAuth: []
       summary: Room Create
       tags:
-      - rooms-create
+      - rooms
   /users/me:
     get:
       consumes:

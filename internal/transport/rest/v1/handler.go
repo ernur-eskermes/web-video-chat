@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
 	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
 	"github.com/gin-gonic/gin"

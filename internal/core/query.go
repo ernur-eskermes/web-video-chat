@@ -1,4 +1,4 @@
-package domain
+package core
 
 type PaginationQuery struct {
 	Skip  int64 `form:"skip"`

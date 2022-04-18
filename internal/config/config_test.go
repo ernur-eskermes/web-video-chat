@@ -53,7 +53,7 @@ func TestInit(t *testing.T) {
 					passwordSalt:  "salt",
 					jwtSigningKey: "key",
 					host:          "localhost",
-					frontendUrl:   "http://localhost:1337",
+					frontendUrl:   "rest://localhost:1337",
 					smtpPassword:  "qwerty123",
 					appEnv:        "local",
 				},

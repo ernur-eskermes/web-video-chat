@@ -4,22 +4,23 @@ package app
 import (
 	"context"
 	"errors"
-	"github.com/gorilla/sessions"
-	"github.com/markbates/goth"
-	"github.com/markbates/goth/gothic"
-	"github.com/markbates/goth/providers/google"
-	"gopkg.in/olahol/melody.v1"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/gorilla/sessions"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/google"
+	"gopkg.in/olahol/melody.v1"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/config"
-	delivery "github.com/ernur-eskermes/web-video-chat/internal/delivery/http"
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
 	"github.com/ernur-eskermes/web-video-chat/internal/server"
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
+	delivery "github.com/ernur-eskermes/web-video-chat/internal/transport/rest"
 	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
 	"github.com/ernur-eskermes/web-video-chat/pkg/database/mongodb"
 	"github.com/ernur-eskermes/web-video-chat/pkg/hash"
@@ -92,7 +93,7 @@ func Run(configPath string) {
 
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
-			logger.Errorf("error occurred while running http server: %s\n", err.Error())
+			logger.Errorf("error occurred while running rest server: %s\n", err.Error())
 		}
 	}()
 

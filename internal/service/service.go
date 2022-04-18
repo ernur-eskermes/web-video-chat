@@ -2,12 +2,13 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/ernur-eskermes/web-video-chat/pkg/room"
 	"github.com/markbates/goth"
 	"gopkg.in/olahol/melody.v1"
-	"time"
 
-	"github.com/ernur-eskermes/web-video-chat/internal/domain"
+	"github.com/ernur-eskermes/web-video-chat/internal/core"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
@@ -28,11 +29,6 @@ type UserSignInInput struct {
 	Password string
 }
 
-type RoomCreateInput struct {
-	UserId primitive.ObjectID
-	Name   string
-}
-
 type Tokens struct {
 	AccessToken  string
 	RefreshToken string
@@ -42,13 +38,15 @@ type Users interface {
 	SignUp(ctx context.Context, input UserSignUpInput) error
 	SignIn(ctx context.Context, input UserSignInInput) (Tokens, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
-	GetById(ctx context.Context, id primitive.ObjectID) (domain.User, error)
+	GetById(ctx context.Context, id primitive.ObjectID) (core.User, error)
 	AuthProvider(ctx context.Context, user goth.User) (Tokens, error)
 	CreateSubscription(ctx context.Context, subscriberId, userId primitive.ObjectID) error
 }
 
 type Rooms interface {
-	Create(ctx context.Context, input RoomCreateInput) (primitive.ObjectID, string, error)
+	Create(ctx context.Context, input core.RoomCreateInput, userID primitive.ObjectID) (primitive.ObjectID, string, error)
+	GetByID(ctx context.Context, roomID, userID primitive.ObjectID) (string, error)
+	GetList(ctx context.Context, roomVisibility bool) ([]core.Room, error)
 }
 
 type CreateMessageInput struct {
@@ -58,7 +56,7 @@ type CreateMessageInput struct {
 }
 
 type Chats interface {
-	GetMessages(ctx context.Context, chatId primitive.ObjectID) ([]domain.Message, error)
+	GetMessages(ctx context.Context, chatId primitive.ObjectID) ([]core.Message, error)
 	CreateMessage(ctx context.Context, input CreateMessageInput) error
 }
 

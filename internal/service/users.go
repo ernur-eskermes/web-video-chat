@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/markbates/goth"
 	"time"
 
-	"github.com/ernur-eskermes/web-video-chat/internal/domain"
+	"github.com/markbates/goth"
+
+	"github.com/ernur-eskermes/web-video-chat/internal/core"
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
 	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
 	"github.com/ernur-eskermes/web-video-chat/pkg/hash"
@@ -25,7 +26,8 @@ type UsersService struct {
 }
 
 func NewUsersService(repo repository.Users, hasher hash.PasswordHasher, tokenManager auth.TokenManager,
-	accessTTL, refreshTTL time.Duration, domain string) *UsersService {
+	accessTTL, refreshTTL time.Duration, domain string,
+) *UsersService {
 	return &UsersService{
 		repo:            repo,
 		hasher:          hasher,
@@ -42,7 +44,7 @@ func (s *UsersService) SignUp(ctx context.Context, input UserSignUpInput) error 
 		return err
 	}
 
-	user := domain.User{
+	user := core.User{
 		Username:     input.Username,
 		Password:     passwordHash,
 		RegisteredAt: time.Now(),
@@ -51,7 +53,7 @@ func (s *UsersService) SignUp(ctx context.Context, input UserSignUpInput) error 
 	}
 
 	if err := s.repo.Create(ctx, &user); err != nil {
-		if errors.Is(err, domain.ErrUserAlreadyExists) {
+		if errors.Is(err, core.ErrUserAlreadyExists) {
 			return err
 		}
 
@@ -69,7 +71,7 @@ func (s *UsersService) SignIn(ctx context.Context, input UserSignInInput) (Token
 
 	user, err := s.repo.GetByCredentials(ctx, input.Username, passwordHash, "")
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
+		if errors.Is(err, core.ErrUserNotFound) {
 			return Tokens{}, err
 		}
 
@@ -88,7 +90,7 @@ func (s *UsersService) RefreshTokens(ctx context.Context, refreshToken string) (
 	return s.createSession(ctx, student.ID)
 }
 
-func (s *UsersService) GetById(ctx context.Context, id primitive.ObjectID) (domain.User, error) {
+func (s *UsersService) GetById(ctx context.Context, id primitive.ObjectID) (core.User, error) {
 	return s.repo.GetById(ctx, id)
 }
 
@@ -108,7 +110,7 @@ func (s *UsersService) createSession(ctx context.Context, userId primitive.Objec
 		return res, err
 	}
 
-	session := domain.Session{
+	session := core.Session{
 		RefreshToken: res.RefreshToken,
 		ExpiresAt:    time.Now().Add(s.refreshTokenTTL),
 	}
@@ -121,8 +123,8 @@ func (s *UsersService) createSession(ctx context.Context, userId primitive.Objec
 func (s *UsersService) AuthProvider(ctx context.Context, user goth.User) (Tokens, error) {
 	userObj, err := s.repo.GetByCredentials(ctx, user.Email, "", user.Provider)
 	if err != nil {
-		if errors.Is(domain.ErrUserNotFound, err) {
-			userObj = domain.User{
+		if errors.Is(core.ErrUserNotFound, err) {
+			userObj = core.User{
 				Username:     user.Email,
 				RegisteredAt: time.Now(),
 				Provider:     user.Provider,
@@ -132,10 +134,13 @@ func (s *UsersService) AuthProvider(ctx context.Context, user goth.User) (Tokens
 			if err = s.repo.Create(ctx, &userObj); err != nil {
 				return Tokens{}, err
 			}
+
 			return s.createSession(ctx, userObj.ID)
 		}
+
 		return Tokens{}, err
 	}
+
 	return s.createSession(ctx, userObj.ID)
 }
 

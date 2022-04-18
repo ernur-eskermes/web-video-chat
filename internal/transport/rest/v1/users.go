@@ -1,9 +1,10 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
 )
 
 func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {

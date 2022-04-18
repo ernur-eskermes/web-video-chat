@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/ernur-eskermes/web-video-chat/internal/domain"
+	"github.com/ernur-eskermes/web-video-chat/internal/core"
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/markbates/goth/gothic"
@@ -67,7 +67,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		Password:        inp.Password,
 		ConfirmPassword: inp.ConfirmPassword,
 	}); err != nil {
-		if errors.Is(err, domain.ErrUserAlreadyExists) {
+		if errors.Is(err, core.ErrUserAlreadyExists) {
 			newResponse(c, http.StatusBadRequest, err.Error())
 
 			return
@@ -106,7 +106,7 @@ func (h *Handler) userSignIn(c *gin.Context) {
 		Password: inp.Password,
 	})
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
+		if errors.Is(err, core.ErrUserNotFound) {
 			newResponse(c, http.StatusBadRequest, err.Error())
 
 			return
@@ -164,7 +164,7 @@ func (h *Handler) userRefresh(c *gin.Context) {
 func (h *Handler) userAuthProvider(c *gin.Context) {
 	v, _ := c.Params.Get("provider")
 	gothic.BeginAuthHandler(c.Writer, c.Request.WithContext(
-		context.WithValue(c.Request.Context(), "provider", v),
+		context.WithValue(c.Request.Context(), gothic.ProviderParamKey, v),
 	))
 }
 
@@ -181,6 +181,7 @@ func (h *Handler) userAuthProviderCallback(c *gin.Context) {
 
 		return
 	}
+
 	res, err := h.services.Users.AuthProvider(c.Request.Context(), user)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
