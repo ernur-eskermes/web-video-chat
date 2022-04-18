@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-contrib/cors"
-
 	"gopkg.in/olahol/melody.v1"
 
 	"github.com/ernur-eskermes/web-video-chat/docs"
@@ -40,8 +38,8 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 	router.Use(
 		gin.Recovery(),
 		gin.Logger(),
-		cors.Default(),
 		limiter.Limit(cfg.Limiter.RPS, cfg.Limiter.Burst, cfg.Limiter.TTL),
+		corsMiddleware,
 	)
 	router.LoadHTMLGlob("templates/*")
 

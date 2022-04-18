@@ -20,7 +20,7 @@ import (
 	"github.com/ernur-eskermes/web-video-chat/internal/repository"
 	"github.com/ernur-eskermes/web-video-chat/internal/server"
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
-	delivery "github.com/ernur-eskermes/web-video-chat/internal/transport/rest"
+	"github.com/ernur-eskermes/web-video-chat/internal/transport/rest"
 	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
 	"github.com/ernur-eskermes/web-video-chat/pkg/database/mongodb"
 	"github.com/ernur-eskermes/web-video-chat/pkg/hash"
@@ -62,7 +62,7 @@ func Run(configPath string) {
 
 	db := mongoClient.Database(cfg.Mongo.Name)
 
-	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
+	hasher := hash.NewSHA256Hasher(cfg.Auth.PasswordSalt)
 
 	tokenManager, err := auth.NewManager(cfg.Auth.JWT.SigningKey)
 	if err != nil {
@@ -86,7 +86,7 @@ func Run(configPath string) {
 		Room:            roomService,
 		Websocket:       websocket,
 	})
-	handlers := delivery.NewHandler(services, tokenManager, websocket)
+	handlers := rest.NewHandler(services, tokenManager, websocket)
 
 	// HTTP Server
 	srv := server.NewServer(cfg, handlers.Init(cfg))
