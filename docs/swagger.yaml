@@ -37,6 +37,13 @@ definitions:
     - name
     - visibility
     type: object
+  v1.ErrorMsg:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
+    type: object
   v1.createSubscriptionInput:
     properties:
       user_id:
@@ -178,11 +185,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/v1.response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.response'
+            $ref: '#/definitions/v1.ErrorMsg'
         "500":
           description: Internal Server Error
           schema:
@@ -216,11 +219,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/v1.response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.response'
+            $ref: '#/definitions/v1.ErrorMsg'
         "500":
           description: Internal Server Error
           schema:
@@ -254,11 +253,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/v1.response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.response'
+            $ref: '#/definitions/v1.ErrorMsg'
         "500":
           description: Internal Server Error
           schema:
@@ -274,7 +269,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get rooms
+      description: get all visibility rooms
       produces:
       - application/json
       responses:
@@ -364,11 +359,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/v1.response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.response'
+            $ref: '#/definitions/v1.ErrorMsg'
         "500":
           description: Internal Server Error
           schema:
@@ -437,11 +428,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/v1.response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.response'
+            $ref: '#/definitions/v1.ErrorMsg'
         "500":
           description: Internal Server Error
           schema:

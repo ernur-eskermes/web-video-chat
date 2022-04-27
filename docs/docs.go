@@ -50,13 +50,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/v1.response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.response"
+                            "$ref": "#/definitions/v1.ErrorMsg"
                         }
                     },
                     "500": {
@@ -108,13 +102,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/v1.response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.response"
+                            "$ref": "#/definitions/v1.ErrorMsg"
                         }
                     },
                     "500": {
@@ -166,13 +154,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/v1.response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.response"
+                            "$ref": "#/definitions/v1.ErrorMsg"
                         }
                     },
                     "500": {
@@ -241,7 +223,7 @@ const docTemplate = `{
                         "UsersAuth": []
                     }
                 ],
-                "description": "get rooms",
+                "description": "get all visibility rooms",
                 "consumes": [
                     "application/json"
                 ],
@@ -325,13 +307,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/v1.response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.response"
+                            "$ref": "#/definitions/v1.ErrorMsg"
                         }
                     },
                     "500": {
@@ -501,13 +477,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/v1.response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.response"
+                            "$ref": "#/definitions/v1.ErrorMsg"
                         }
                     },
                     "500": {
@@ -579,6 +549,17 @@ const docTemplate = `{
                 },
                 "visibility": {
                     "type": "boolean"
+                }
+            }
+        },
+        "v1.ErrorMsg": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         },

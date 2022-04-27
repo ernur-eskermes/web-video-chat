@@ -36,28 +36,28 @@ type roomCreateResponse struct {
 // @Produce  json
 // @Param input body core.RoomCreateInput true "sign up info"
 // @Success 201 {object} roomCreateResponse
-// @Failure 400,404 {object} response
+// @Failure 400 {object} ErrorMsg
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /rooms/create [post]
 func (h *Handler) roomCreate(c *gin.Context) {
 	var inp core.RoomCreateInput
-	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
+	if err := c.ShouldBindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
 
 	userId, err := getUserId(c)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
 
 	roomId, token, err := h.services.Rooms.Create(c.Request.Context(), inp, userId)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -71,7 +71,7 @@ func (h *Handler) roomCreate(c *gin.Context) {
 // @Summary Room List
 // @Tags rooms
 // @Security UsersAuth
-// @Description get rooms
+// @Description get all visibility rooms
 // @ModuleID roomList
 // @Accept  json
 // @Produce  json
@@ -82,14 +82,14 @@ func (h *Handler) roomCreate(c *gin.Context) {
 // @Router /rooms [get]
 func (h *Handler) roomList(c *gin.Context) {
 	if _, err := getUserId(c); err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
 
 	rooms, err := h.services.Rooms.GetList(c.Request.Context(), true)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -117,14 +117,14 @@ type roomTokenResponse struct {
 func (h *Handler) roomJoin(c *gin.Context) {
 	userID, err := getUserId(c)
 	if err != nil {
-		newResponse(c, http.StatusBadRequest, err.Error())
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
 
 	roomID, err := getIdByContext(c, "roomID")
 	if err != nil {
-		newResponse(c, http.StatusBadRequest, err.Error())
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
@@ -132,12 +132,12 @@ func (h *Handler) roomJoin(c *gin.Context) {
 	token, err := h.services.Rooms.GetByID(c.Request.Context(), roomID, userID)
 	if err != nil {
 		if errors.Is(err, core.ErrRoomNotFound) {
-			newResponse(c, http.StatusNotFound, err.Error())
+			newResponse(c, http.StatusNotFound, err)
 
 			return
 		}
 
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}

@@ -25,14 +25,14 @@ func (h *Handler) indexChat(c *gin.Context) {
 func (h *Handler) chatWebsocket(c *gin.Context) {
 	chatId, err := parseIdFromPath(c, "id")
 	if err != nil {
-		newResponse(c, http.StatusBadRequest, err.Error())
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
 
 	userId, err := getUserId(c)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -57,7 +57,7 @@ func (h *Handler) chatWebsocket(c *gin.Context) {
 	})
 
 	if err = h.websocket.HandleRequest(c.Writer, c.Request); err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}

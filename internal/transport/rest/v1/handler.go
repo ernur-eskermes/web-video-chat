@@ -3,6 +3,8 @@ package v1
 import (
 	"errors"
 
+	"github.com/go-playground/validator/v10"
+
 	"github.com/ernur-eskermes/web-video-chat/internal/service"
 	"github.com/ernur-eskermes/web-video-chat/pkg/auth"
 	"github.com/gin-gonic/gin"
@@ -46,4 +48,26 @@ func parseIdFromPath(c *gin.Context, param string) (primitive.ObjectID, error) {
 	}
 
 	return id, nil
+}
+
+func getErrorMsg(fe validator.FieldError) string {
+	switch fe.Tag() {
+	case "required":
+		return "This field is required"
+	case "lte":
+		return "Should be less than " + fe.Param()
+	case "gte":
+		return "Should be greater than " + fe.Param()
+	case "min":
+		return "Should be min than " + fe.Param()
+	case "max":
+		return "Should be max than " + fe.Param()
+	}
+
+	return "Unknown error"
+}
+
+type ErrorMsg struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
 }

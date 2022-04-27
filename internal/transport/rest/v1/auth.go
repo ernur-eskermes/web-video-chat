@@ -50,14 +50,14 @@ type refreshInput struct {
 // @Produce  json
 // @Param input body userSignUpInput true "sign up info"
 // @Success 201 {string} string "ok"
-// @Failure 400,404 {object} response
+// @Failure 400 {object} ErrorMsg
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /auth/sign-up [post]
 func (h *Handler) userSignUp(c *gin.Context) {
 	var inp userSignUpInput
-	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
+	if err := c.ShouldBindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
@@ -68,12 +68,12 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		ConfirmPassword: inp.ConfirmPassword,
 	}); err != nil {
 		if errors.Is(err, core.ErrUserAlreadyExists) {
-			newResponse(c, http.StatusBadRequest, err.Error())
+			newResponse(c, http.StatusBadRequest, err)
 
 			return
 		}
 
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -89,14 +89,14 @@ func (h *Handler) userSignUp(c *gin.Context) {
 // @Produce  json
 // @Param input body signInInput true "sign up info"
 // @Success 200 {object} tokenResponse
-// @Failure 400,404 {object} response
+// @Failure 400 {object} ErrorMsg
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /auth/sign-in [post]
 func (h *Handler) userSignIn(c *gin.Context) {
 	var inp signInInput
-	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
+	if err := c.ShouldBindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
@@ -107,12 +107,12 @@ func (h *Handler) userSignIn(c *gin.Context) {
 	})
 	if err != nil {
 		if errors.Is(err, core.ErrUserNotFound) {
-			newResponse(c, http.StatusBadRequest, err.Error())
+			newResponse(c, http.StatusBadRequest, err)
 
 			return
 		}
 
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -130,21 +130,21 @@ func (h *Handler) userSignIn(c *gin.Context) {
 // @Produce  json
 // @Param input body refreshInput true "sign up info"
 // @Success 200 {object} tokenResponse
-// @Failure 400,404 {object} response
+// @Failure 400 {object} ErrorMsg
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /auth/refresh [post]
 func (h *Handler) userRefresh(c *gin.Context) {
 	var inp refreshInput
-	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
+	if err := c.ShouldBindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
 
 	res, err := h.services.Users.RefreshTokens(c.Request.Context(), inp.Token)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -177,14 +177,14 @@ func (h *Handler) userAuthProvider(c *gin.Context) {
 func (h *Handler) userAuthProviderCallback(c *gin.Context) {
 	user, err := gothic.CompleteUserAuth(c.Writer, c.Request)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
 
 	res, err := h.services.Users.AuthProvider(c.Request.Context(), user)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}

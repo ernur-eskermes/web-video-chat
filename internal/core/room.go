@@ -18,6 +18,6 @@ type Room struct {
 
 type RoomCreateInput struct {
 	Name       string               `json:"name" binding:"required,min=8,max=64"`
-	Visibility bool                 `json:"visibility" binding:"required"`
+	Visibility *bool                `json:"visibility" binding:"required"`
 	Invites    []primitive.ObjectID `json:"invites"`
 }

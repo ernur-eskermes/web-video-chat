@@ -4,6 +4,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -127,6 +128,12 @@ func OAuthInit(cfg *config.Config) {
 	gothic.Store = store
 
 	goth.UseProviders(
-		google.New(cfg.GoogleOauth.ClientId, cfg.GoogleOauth.ClientSecret, cfg.GoogleOauth.CallbackURL),
+		google.New(cfg.GoogleOauth.ClientId, cfg.GoogleOauth.ClientSecret,
+			fmt.Sprintf("%s://%s:%s/%s",
+				cfg.HTTP.Schema,
+				cfg.HTTP.Host,
+				cfg.HTTP.Port,
+				cfg.GoogleOauth.CallbackURL),
+		),
 	)
 }

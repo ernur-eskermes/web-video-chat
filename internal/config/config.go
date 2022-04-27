@@ -64,7 +64,8 @@ type (
 	}
 
 	HTTPConfig struct {
-		Host               string        `mapstructure:"host"`
+		Schema             string
+		Host               string
 		Port               string        `mapstructure:"port"`
 		ReadTimeout        time.Duration `mapstructure:"readTimeout"`
 		WriteTimeout       time.Duration `mapstructure:"writeTimeout"`
@@ -131,6 +132,7 @@ func setFromEnv(cfg *Config) {
 	cfg.Auth.SessionSecret = os.Getenv("SESSION_SECRET")
 
 	cfg.HTTP.Host = os.Getenv("HTTP_HOST")
+	cfg.HTTP.Schema = os.Getenv("HTTP_SCHEMA")
 
 	cfg.Environment = os.Getenv("APP_ENV")
 }

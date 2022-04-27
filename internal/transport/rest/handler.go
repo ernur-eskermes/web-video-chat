@@ -49,7 +49,14 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 	}
 
 	if cfg.Environment != config.Prod {
-		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(
+			swaggerFiles.Handler,
+			ginSwagger.URL(fmt.Sprintf("%s://%s/%s",
+				cfg.HTTP.Schema,
+				docs.SwaggerInfo.Host,
+				"swagger/doc.json",
+			)),
+		))
 	}
 
 	// Init router

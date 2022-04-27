@@ -39,14 +39,14 @@ type userAccountResponse struct {
 func (h *Handler) userGetMe(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
 
 	user, err := h.services.Users.GetById(c.Request.Context(), userId)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -71,28 +71,28 @@ type createSubscriptionInput struct {
 // @Produce  json
 // @Param input body createSubscriptionInput true "create subscription"
 // @Success 201 {string} string ok
-// @Failure 400,404 {object} response
+// @Failure 400 {object} ErrorMsg
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /users/subscriptions/create [post]
 func (h *Handler) createSubscription(c *gin.Context) {
 	var inp createSubscriptionInput
-	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
+	if err := c.ShouldBindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, err)
 
 		return
 	}
 
 	userId, err := getUserId(c)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}
 
 	err = h.services.Users.CreateSubscription(c, userId, inp.UserId)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusInternalServerError, err)
 
 		return
 	}

@@ -25,7 +25,7 @@ func NewRoomsService(repo repository.Rooms, room room.Room) *RoomsService {
 func (s *RoomsService) Create(ctx context.Context, input core.RoomCreateInput, userID primitive.ObjectID) (primitive.ObjectID, string, error) {
 	roomId, err := s.repo.Create(ctx, core.Room{
 		Name:       input.Name,
-		Visibility: input.Visibility,
+		Visibility: *input.Visibility,
 		Author:     userID,
 		Members:    []primitive.ObjectID{userID},
 		CreatedAt:  time.Now(),
